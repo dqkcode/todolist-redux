@@ -2,11 +2,11 @@ import React, { Component } from 'react';
 
 class TableRow extends Component {
     render() {
-        let { tasks } = this.props
+        let { tasks } = this.props;
         let rows = tasks.map((task, index) => {
             return (
-                <tr key={index}>
-                    <td >{index}</td>
+                <tr key={task.id}>
+                    <td >{index +1 }</td>
                     <td>{task.name}</td>
                     <td>
                         {
@@ -26,9 +26,9 @@ class TableRow extends Component {
             )
         })
         return (
-            
+            <tbody>
                 {rows}
-            
+            </tbody>
         );
     }
 }

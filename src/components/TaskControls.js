@@ -2,11 +2,10 @@ import React, { Component } from 'react';
 
 class TaskControls extends Component {
     
+   
     
     render() {
         return (
-            <div className="row">
-                <button type="button" className="col-sm-2 btn btn-info m-1 float-left"><i className="fas fa-plus-square"> </i> Add Task</button>
                 <div className="col-sm-9 m-1">
                     <div className="row">
                         <input type="text" className="col-sm-8 form-control" />
@@ -21,7 +20,6 @@ class TaskControls extends Component {
                         </div>
                     </div>
                 </div>
-            </div>
         );
     }
 }

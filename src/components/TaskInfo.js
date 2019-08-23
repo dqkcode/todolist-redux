@@ -5,6 +5,7 @@ class TaskInfo extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            id:'',
             inputName: '',
             selectStatus: false
         }
@@ -23,11 +24,50 @@ class TaskInfo extends Component {
     onSubmitInfo = (event) => {
         event.preventDefault();
         this.props.onSubmit(this.state)
+        this.onCancel()
+        this.onCloseInfoForm()
+    }
+    onCancel = () => {
+        this.setState({
+            inputName: '',
+            selectStatus: true
+        })
+        this.onCloseInfoForm()
+    }
+    UNSAFE_componentWillMount(){
+        if(this.props.objectEdit){
+            this.setState({
+                id:this.props.objectEdit.id,
+                inputName:this.props.objectEdit.name,
+                selectStatus:this.props.objectEdit.status
+            });
+        }
+        
+    }
+    UNSAFE_componentWillReceiveProps(nextProps){
+        // console.log(nextProps);
+        if(nextProps && nextProps.objectEdit){
+            // console.log('nexprops :', nextProps);
+            this.setState({
+                id:nextProps.objectEdit.id,
+                inputName:nextProps.objectEdit.name,
+                selectStatus:nextProps.objectEdit.status
+            });
+        }else if(!nextProps.objectEdit){
+                this.setState({
+                        id:'',
+                        inputName: '',
+                        selectStatus: false
+                })
+        }
     }
     render() {
+        let {id} = this.state       
+        // console.log('id :', id);
         return (
+           
             <div className="card">
-                <div className="card-header"> Task Info
+                <div className="card-header"> {id!==''?"Edit task":"Add new task"}
          <button
                         type="button"
                         className="close"
@@ -42,7 +82,7 @@ class TaskInfo extends Component {
                             <input
                                 type="text"
                                 className="form-control"
-                                placeholder="name"
+                                value={this.state.inputName}
                                 name="inputName"
                                 onChange={this.onChange}
                             />
@@ -53,9 +93,9 @@ class TaskInfo extends Component {
                                 className="form-control"
                                 name="selectStatus"
                                 onChange={this.onChange}
-                                 value={this.state.selectStatus}
-                                >
-                                    
+                                value={this.state.selectStatus}
+                            >
+
                                 <option value={true}>On</option>
                                 <option value={false}>Off</option>
 
@@ -65,7 +105,11 @@ class TaskInfo extends Component {
                             <div className="col-sm-8 offset-sm-2">
                                 <div>
                                     <button type="submit" className="btn btn-primary mr-1">Save</button>
-                                    <button type="button" className="btn btn-danger">Cancel</button>
+                                    <button
+                                        type="button"
+                                        className="btn btn-danger"
+                                        onClick={this.onCancel}
+                                    >Cancel</button>
                                 </div>
 
                             </div>

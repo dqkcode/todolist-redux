@@ -2,8 +2,8 @@ import './App.css';
 import TableRow from './components/TableRow';
 import TaskInfo from './components/TaskInfo';
 import TaskControls from './components/TaskControls';
-
 import React, { Component } from 'react';
+import _ from 'lodash';
 
 class App extends Component {
   constructor(props) {
@@ -15,6 +15,11 @@ class App extends Component {
       onjectSearch: {
         searchByName: '',
         searchByStatus: 1
+      },
+      inputTxtKeyword: '',
+      sortType: {
+        type: 'name',
+        value: 'az'
       }
     }
   }
@@ -104,7 +109,8 @@ class App extends Component {
   }
   onUpdateStatus = (id) => {
     let { tasks } = this.state
-    let index = this.findIndex(id)
+    // let index = this.findIndex(id) //using my function
+    let index = _.findIndex(tasks,(task)=>task.id === id)
     if (index !== -1) {
       tasks[index].status = !tasks[index].status
       // console.log('tasks[index].status :', tasks[index].status);
@@ -158,25 +164,69 @@ class App extends Component {
       }
     });
   }
+  searchOnFormControl = (inputTxtKeyword) => {
+    this.setState({
+      inputTxtKeyword: inputTxtKeyword.toLowerCase()
+    });
+  }
+  onSort = (typeName, typeValue) => {
+    // console.log('typeName :', typeName);
+    // console.log('typeValue :', typeValue);
+    this.setState({
+      sortType: {
+        type: typeName,
+        value: typeValue
+      }
+    });
+  }
+
   render() {
-    let { tasks, showTaskForm, objectEdit, objectSearch } = this.state
-    // console.log('objectSearch :', objectSearch);
+    let {
+      tasks,
+      showTaskForm,
+      objectEdit,
+      objectSearch,
+      inputTxtKeyword,
+      sortType } = this.state
+    //  console.log('sortType :', sortType);
     if (objectSearch) {
       if (objectSearch.searchByName) {
         tasks = tasks.filter(
           (task) => task.name.toLowerCase().indexOf(objectSearch.searchByName) !== -1
         )
       }
-        tasks = tasks.filter(
-          (task) => {
-            if(objectSearch.searchByStatus === 1){
-              return task
-            }else{
-              return task.status === (objectSearch.searchByStatus === 0 ?true:false)
-            }
+      tasks = tasks.filter(
+        (task) => {
+          if (objectSearch.searchByStatus === 1) {
+            return task
+          } else {
+            return task.status === (objectSearch.searchByStatus === 0 ? true : false)
           }
-        )
-      
+        }
+      )
+
+
+    }
+    // console.log('inputTxtKeyword :', inputTxtKeyword);
+
+    tasks = tasks.filter(
+      (task) =>
+        inputTxtKeyword ?
+          task.name.toLowerCase().indexOf(inputTxtKeyword) !== -1 :
+          tasks)
+
+
+    // if (inputTxtKeyword === '')
+    //    return tasks
+    if (sortType.type === 'name') {
+      sortType.value === 'az'
+        ? tasks.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase()) ? 1 : -1)
+        : tasks.sort((a, b) => (a.name.toLowerCase() < b.name.toLowerCase()) ? 1 : -1)
+    } else {
+      sortType.value === 'on'
+      ? tasks.sort((a, b) => (a.status > b.status) ? -1 : 1)
+      : tasks.sort((a, b) => (a.status < b.status) ? -1 : 1)
+
     }
 
     let infoForm = showTaskForm ? <TaskInfo
@@ -217,7 +267,10 @@ class App extends Component {
                     <i className="fas fa-plus-square" > </i>
                     &nbsp; Add Task
                  </button>
-                  <TaskControls ></TaskControls>
+                  <TaskControls
+                    searchOnFormControl={this.searchOnFormControl}
+                    onSort={this.onSort}
+                  ></TaskControls>
                 </div>
                 {/* end list controls */}
                 <div className="row">
@@ -228,7 +281,6 @@ class App extends Component {
           <col className="col-sm-3"/>
           <col className="col-sm-3"/>
         </colgroup> */}
-
                     <thead>
                       <tr className="d-flex">
                         <th className="col-1">No.</th>
@@ -254,9 +306,7 @@ class App extends Component {
           </div>
           {/* end tasklist */}
         </div>
-
       </div>
-
     );
   }
 }

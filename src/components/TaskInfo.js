@@ -1,15 +1,17 @@
 import React, { Component } from 'react';
-
+import { connect } from 'react-redux'
+import * as actions from './../actions'
 class TaskInfo extends Component {
-    onCloseInfoForm = () => this.props.onCloseInfoForm()
     constructor(props) {
         super(props);
         this.state = {
-            id:'',
+            id: '',
             inputName: '',
             selectStatus: false
         }
     }
+    onCloseInfoForm = () => this.props.onCloseInfoForm()
+
     onChange = (event) => {
         let target = event.target
         let name = target.name
@@ -23,7 +25,10 @@ class TaskInfo extends Component {
     }
     onSubmitInfo = (event) => {
         event.preventDefault();
-        this.props.onSubmit(this.state)
+        // this.props.onSubmit(this.state)
+        // console.log('submit: this.state', this.state)
+        // console.log('this.props.addtask', this.props.addTask)
+        this.props.addTask(this.state)
         this.onCancel()
         this.onCloseInfoForm()
     }
@@ -34,41 +39,43 @@ class TaskInfo extends Component {
         })
         this.onCloseInfoForm()
     }
-    UNSAFE_componentWillMount(){
-        if(this.props.objectEdit){
+    UNSAFE_componentWillMount() {
+        if (this.props.objectEdit) {
             this.setState({
-                id:this.props.objectEdit.id,
-                inputName:this.props.objectEdit.name,
-                selectStatus:this.props.objectEdit.status
+                id: this.props.objectEdit.id,
+                inputName: this.props.objectEdit.name,
+                selectStatus: this.props.objectEdit.status
             });
         }
-        
+
     }
-    UNSAFE_componentWillReceiveProps(nextProps){
+    UNSAFE_componentWillReceiveProps(nextProps) {
         // console.log(nextProps);
-        if(nextProps && nextProps.objectEdit){
+        if (nextProps && nextProps.objectEdit) {
             // console.log('nexprops :', nextProps);
             this.setState({
-                id:nextProps.objectEdit.id,
-                inputName:nextProps.objectEdit.name,
-                selectStatus:nextProps.objectEdit.status
+                id: nextProps.objectEdit.id,
+                inputName: nextProps.objectEdit.name,
+                selectStatus: nextProps.objectEdit.status
             });
-        }else if(!nextProps.objectEdit){
-                this.setState({
-                        id:'',
-                        inputName: '',
-                        selectStatus: false
-                })
+        } else if (!nextProps.objectEdit) {
+            this.setState({
+                id: '',
+                inputName: '',
+                selectStatus: false
+            })
         }
     }
     render() {
-        let {id} = this.state       
+        let { id } = this.state
+        let {taskEdit} = this.props
+        console.log('taskEdit', taskEdit)
         // console.log('id :', id);
         return (
-           
+
             <div className="card">
-                <div className="card-header"> {id!==''?"Edit task":"Add new task"}
-         <button
+                <div className="card-header"> {taskEdit.id !== '' ? "Edit task" : "Add new task"}
+                    <button
                         type="button"
                         className="close"
                         onClick={this.onCloseInfoForm}>
@@ -82,7 +89,7 @@ class TaskInfo extends Component {
                             <input
                                 type="text"
                                 className="form-control"
-                                value={this.state.inputName}
+                                value={taskEdit.name}
                                 name="inputName"
                                 onChange={this.onChange}
                             />
@@ -93,7 +100,7 @@ class TaskInfo extends Component {
                                 className="form-control"
                                 name="selectStatus"
                                 onChange={this.onChange}
-                                value={this.state.selectStatus}
+                                value={taskEdit.status}
                             >
 
                                 <option value={true}>On</option>
@@ -121,4 +128,15 @@ class TaskInfo extends Component {
     }
 }
 
-export default TaskInfo;
+const mapStateToProps = (state) => ({
+    taskEdit:state.taskEdit
+})
+
+const mapDispatchToProps = (dispatch, props) => ({
+        addTask: (task) => {
+            dispatch(actions.addTask(task));
+        }
+    })
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(TaskInfo);

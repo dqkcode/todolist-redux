@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-
+import { connect } from 'react-redux';
+import * as actions from './../actions'
 class TableRow extends Component {
     constructor(props) {
         super(props);
@@ -10,14 +11,16 @@ class TableRow extends Component {
     }
     
     updateStatus = (id) => {
-        this.props.updateStatus(id)
+        this.props.onUpdateStatus(id)
     }
     onRemove = (id) => {
-        this.props.Remove(id)
+        this.props.onDeleteTask(id)
     }
-    onEdit = (id) => {
-        this.props.Edit(id)
+    onEdit = (task) => {
+        this.props.onEditTask(task)
+        this.props.onOpenForm()
     }
+
     onChange = (event) => {
         let target = event.target
         let name = target.name
@@ -32,8 +35,10 @@ class TableRow extends Component {
 
     }
     render() {
+       
         let {sortByName, sortByStatus} = this.state
         let { tasks } = this.props;
+        // console.log('tasks', tasks)
         let rows = tasks.map((task, index) => {
             return (
                 <tr className="d-flex" key={task.id}>
@@ -53,12 +58,12 @@ class TableRow extends Component {
                                 <button
                                     type="button"
                                     className="btn btn-primary btn-sm mr-2"
-                                    onClick={() => this.onEdit(task.id)}
+                                    onClick={() => this.onEdit(task)}
                                 ><i className="fas fa-edit "></i> Edit</button>
                                 <button
                                     type="button"
                                     className="btn btn-danger btn-sm "
-                                    onClick={() => this.onRemove(task.id)}
+                                    onClick={()=>this.onRemove(task.id)}
                                 ><i className="fas fa-trash-alt    "></i> Remove</button>
                             </div>
                         </div>
@@ -100,4 +105,16 @@ class TableRow extends Component {
     }
 }
 
-export default TableRow;
+const mapStateToProps = (state) => ({
+     tasks:state.tasks,
+})
+
+const mapDispatchToProps = (dispatch,props)=>({
+  onUpdateStatus: (id)=> dispatch(actions.updateStatus(id)),
+  onDeleteTask:(id)=>dispatch(actions.deleteTask(id)),
+  onEditTask:(task)=>dispatch(actions.editTask(task)),
+  onOpenForm : ()=>dispatch(actions.openForm())
+//   onCloseForm : ()=>dispatch(actions.closeForm())
+})
+
+export default connect(mapStateToProps,mapDispatchToProps)(TableRow);

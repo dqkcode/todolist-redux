@@ -2,6 +2,8 @@ import './App.css';
 import TableRow from './components/TableRow';
 import TaskInfo from './components/TaskInfo';
 import TaskControls from './components/TaskControls';
+import { connect } from "react-redux";
+import  * as actions  from "./actions";
 import React, { Component } from 'react';
 import _ from 'lodash';
 
@@ -23,37 +25,7 @@ class App extends Component {
       }
     }
   }
-  c4() {
-    return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1)
-  }
-  genId() {
-    return this.c4() + this.c4() + '-' + this.c4() + this.c4() + '-' + this.c4() + this.c4()
-  }
-  // onCreateData = () => {
-  //   var tasks_data = [
-  //     {
-  //       id: this.genId(),
-  //       name: 'Python',
-  //       status: true
-  //     },
-  //     {
-  //       id: this.genId(),
-  //       name: 'C++',
-  //       status: true
-  //     },
-  //     {
-  //       id: this.genId(),
-  //       name: 'Java',
-  //       status: false
-  //     }
-  //   ]
-  //   this.setState({
-  //     tasks: tasks_data
-  //   });
-  //   localStorage.setItem('localStorage_tasks', JSON.stringify(tasks_data))
 
-
-  // }
   UNSAFE_componentWillMount() {
     if (localStorage && localStorage.getItem('localStorage_tasks')) {
       let localStorage_tasks = JSON.parse(localStorage.getItem('localStorage_tasks'))
@@ -63,23 +35,25 @@ class App extends Component {
     }
   }
   onShowInfoForm = () => {
-    if (this.state.objectEdit !== null && this.state.showTaskForm) {
-      // console.log("ob != null and show form");
-      this.setState({
-        showTaskForm: true,
-        objectEdit: null
-      })
-    } else {
-      this.setState({
-        showTaskForm: !this.state.showTaskForm,
-        objectEdit: null
-      })
-    }
+    // if (this.state.objectEdit !== null && this.state.showTaskForm) {
+    //   // console.log("ob != null and show form");
+    //   this.setState({
+    //     showTaskForm: true,
+    //     objectEdit: null
+    //   })
+    // } else {
+    //   this.setState({
+    //     showTaskForm: !this.state.showTaskForm,
+    //     objectEdit: null
+    //   })
+    // }
+    this.props.onOpenForm()
   }
   onCloseInfoForm = () => {
-    this.setState({
-      showTaskForm: false
-    });
+    // this.setState({
+    //   showTaskForm: false
+    // });
+    this.props.onCloseForm()
   }
   onShowEditForm = () => {
     this.setState({
@@ -110,7 +84,7 @@ class App extends Component {
   onUpdateStatus = (id) => {
     let { tasks } = this.state
     // let index = this.findIndex(id) //using my function
-    let index = _.findIndex(tasks,(task)=>task.id === id)
+    let index = _.findIndex(tasks, (task) => task.id === id)
     if (index !== -1) {
       tasks[index].status = !tasks[index].status
       // console.log('tasks[index].status :', tasks[index].status);
@@ -183,12 +157,14 @@ class App extends Component {
   render() {
     let {
       tasks,
-      showTaskForm,
       objectEdit,
       objectSearch,
       inputTxtKeyword,
       sortType } = this.state
     //  console.log('sortType :', sortType);
+
+    let { showInfoForm } = this.props
+    // console.log('showInfoForm :', showInfoForm);
     if (objectSearch) {
       if (objectSearch.searchByName) {
         tasks = tasks.filter(
@@ -214,22 +190,18 @@ class App extends Component {
         inputTxtKeyword ?
           task.name.toLowerCase().indexOf(inputTxtKeyword) !== -1 :
           tasks)
-
-
-    // if (inputTxtKeyword === '')
-    //    return tasks
     if (sortType.type === 'name') {
       sortType.value === 'az'
         ? tasks.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase()) ? 1 : -1)
         : tasks.sort((a, b) => (a.name.toLowerCase() < b.name.toLowerCase()) ? 1 : -1)
     } else {
       sortType.value === 'on'
-      ? tasks.sort((a, b) => (a.status > b.status) ? -1 : 1)
-      : tasks.sort((a, b) => (a.status < b.status) ? -1 : 1)
+        ? tasks.sort((a, b) => (a.status > b.status) ? -1 : 1)
+        : tasks.sort((a, b) => (a.status < b.status) ? -1 : 1)
 
     }
 
-    let infoForm = showTaskForm ? <TaskInfo
+    let infoForm = showInfoForm ? <TaskInfo
       onCloseInfoForm={this.onCloseInfoForm}
       onSubmit={this.onSubmitInfo}
       objectEdit={objectEdit}
@@ -250,11 +222,11 @@ class App extends Component {
         {/* end header */}
         <div className="row mt-3">
 
-          <div className={showTaskForm ? "col-sm-4" : ""}>
+          <div className={showInfoForm ? "col-sm-4" : ""}>
             {infoForm}
             {/* end taskinfo */}
           </div>
-          <div className={showTaskForm ? "col-sm-8" : "col-sm-12"}>
+          <div className={showInfoForm ? "col-sm-8" : "col-sm-12"}>
             <div className="card">
               <div className="card-header"> Task List </div>
               <div className="card-body">
@@ -290,10 +262,10 @@ class App extends Component {
                       </tr>
                     </thead>
                     <TableRow
-                      tasks={tasks}
-                      updateStatus={this.onUpdateStatus}
-                      Remove={this.onRemove}
-                      Edit={this.onEdit}
+                      // tasks={tasks}
+                      // updateStatus={this.onUpdateStatus}
+                      // Remove={this.onRemove}
+                      // Edit={this.onEdit}
                       onSearch={this.onSearch}
                     ></TableRow>
                     {/* end table row task */}
@@ -310,6 +282,14 @@ class App extends Component {
     );
   }
 }
+const mapStateToProps = (state) => ({
+  showInfoForm: state.showInfoForm
+})
 
-export default App;
+const mapDispatchToProps = (dispatch) => ({
+  onOpenForm : ()=>dispatch(actions.openForm()),
+  onCloseForm : ()=>dispatch(actions.closeForm()),
+  onToggleForm : ()=>dispatch(actions.toggleForm()),
+})
+export default connect(mapStateToProps, mapDispatchToProps)(App);
 

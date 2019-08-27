@@ -1,16 +1,18 @@
 import * as types from '../constants'
-let showInfoForm = {
+
+let objectState = {
 
 }
-const initialState = showInfoForm
+const initialState = objectState
 
 
 export default (state = initialState, action) => {
 
     switch (action.type) {
         case types.EDIT_TASK:
-        console.log('action :', action);
+            console.log('action.task - reducer:', action.task);
             return {...action.task}
+       
 
         default:
             return state

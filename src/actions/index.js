@@ -28,3 +28,7 @@ export const editTask = (task) => ({
     type: types.EDIT_TASK,
     task
 })
+export const saveTask = (task) => ({
+    type: types.SAVE_TASK,
+    task
+})

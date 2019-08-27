@@ -19,23 +19,36 @@ export default (state = initialState, action) => {
         case types.SHOW_ALL_TASKS:
             console.log('show all');
             return state
-        case types.ADD_TASK:
+        // case types.ADD_TASK:
+        //     let new_task = {}
+        //     new_task.id = genId()
+        //     new_task.name = action.task.inputName
+        //     new_task.status = action.task.selectStatus
+        //     state.push(new_task)
+        //     localStorage.setItem('localStorage_tasks', JSON.stringify(state))
+        //     return [...state]
+        case types.SAVE_TASK:
             let new_task = {}
-            new_task.id = genId()
-            new_task.name = action.task.inputName
-            new_task.status = action.task.selectStatus
-            state.push(new_task)
+            if (!action.task.id) {
+                new_task.id = genId()
+                new_task.name = action.task.inputName
+                new_task.status = action.task.selectStatus
+                state.push(new_task)
+            } else {
+                index = _.findIndex(state, (task) => task.id === action.id)
+                state[index] = new_task
+            }
             localStorage.setItem('localStorage_tasks', JSON.stringify(state))
             return [...state]
         case types.UPDATE_STATUS:
             index = _.findIndex(state, (task) => task.id === action.id)
             state[index].status = !state[index].status
-        
+
             localStorage.setItem('localStorage_tasks', JSON.stringify(state))
             return [...state];
         case types.DELETE_TASK:
             index = _.findIndex(state, (task) => task.id === action.id)
-            state.splice(index,1)
+            state.splice(index, 1)
             localStorage.setItem('localStorage_tasks', JSON.stringify(state))
 
             return [...state];

@@ -9,6 +9,7 @@ class TaskInfo extends Component {
             inputName: '',
             selectStatus: false
         }
+        
     }
     onCloseInfoForm = () => this.props.onCloseInfoForm()
 
@@ -28,7 +29,7 @@ class TaskInfo extends Component {
         // this.props.onSubmit(this.state)
         // console.log('submit: this.state', this.state)
         // console.log('this.props.addtask', this.props.addTask)
-        this.props.addTask(this.state)
+        this.props.saveTask(this.state)
         this.onCancel()
         this.onCloseInfoForm()
     }
@@ -39,26 +40,29 @@ class TaskInfo extends Component {
         })
         this.onCloseInfoForm()
     }
-    UNSAFE_componentWillMount() {
-        if (this.props.objectEdit) {
-            this.setState({
-                id: this.props.objectEdit.id,
-                inputName: this.props.objectEdit.name,
-                selectStatus: this.props.objectEdit.status
-            });
-        }
+    
+ 
+ 
+    // UNSAFE_componentWillMount() {
+    //     if (this.props.objectEdit) {
+    //         this.setState({
+    //             id: this.props.objectEdit.id,
+    //             inputName: this.props.objectEdit.name,
+    //             selectStatus: this.props.objectEdit.status
+    //         });
+    //     }
 
-    }
+    // }
     UNSAFE_componentWillReceiveProps(nextProps) {
-        // console.log(nextProps);
-        if (nextProps && nextProps.objectEdit) {
+        console.log("nextprops: ",nextProps.taskEdit);
+        if (nextProps && nextProps.taskEdit) {
             // console.log('nexprops :', nextProps);
             this.setState({
-                id: nextProps.objectEdit.id,
-                inputName: nextProps.objectEdit.name,
-                selectStatus: nextProps.objectEdit.status
+                id: nextProps.taskEdit.id,
+                inputName: nextProps.taskEdit.name,
+                selectStatus: nextProps.taskEdit.status
             });
-        } else if (!nextProps.objectEdit) {
+        } else if (!nextProps.taskEdit) {
             this.setState({
                 id: '',
                 inputName: '',
@@ -66,15 +70,18 @@ class TaskInfo extends Component {
             })
         }
     }
+    
     render() {
-        let { id } = this.state
         let {taskEdit} = this.props
-        console.log('taskEdit', taskEdit)
+        taskEdit={}
+        console.log('taskEdit - view', taskEdit)
+        console.log('this.state :', this.state);
         // console.log('id :', id);
         return (
 
             <div className="card">
-                <div className="card-header"> {taskEdit.id !== '' ? "Edit task" : "Add new task"}
+                <div className="card-header"> {taskEdit.id ? "Edit task" : "Add new task"}
+                {/* <div className="card-header"> {taskEdit.id ? taskEdit.id  : "new" } */}
                     <button
                         type="button"
                         className="close"
@@ -89,7 +96,7 @@ class TaskInfo extends Component {
                             <input
                                 type="text"
                                 className="form-control"
-                                value={taskEdit.name}
+                                value={this.state.inputName}
                                 name="inputName"
                                 onChange={this.onChange}
                             />
@@ -100,7 +107,7 @@ class TaskInfo extends Component {
                                 className="form-control"
                                 name="selectStatus"
                                 onChange={this.onChange}
-                                value={taskEdit.status}
+                                value={this.state.selectStatus}
                             >
 
                                 <option value={true}>On</option>
@@ -133,8 +140,8 @@ const mapStateToProps = (state) => ({
 })
 
 const mapDispatchToProps = (dispatch, props) => ({
-        addTask: (task) => {
-            dispatch(actions.addTask(task));
+        saveTask: (task) => {
+            dispatch(actions.saveTask(task));
         }
     })
 
